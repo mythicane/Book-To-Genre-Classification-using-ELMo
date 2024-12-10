@@ -28,28 +28,37 @@ from nltk.corpus import brown
 import sys #for the suppression of warnings
 import numpy as np
 import pandas as pd
+from multiprocessing import Pool
+import multiprocessing as mp
+from textcompressor import *
 
 if not sys.warnoptions: #Suppresses warnings
     import warnings
-    warnings.simplefilter("ignore")
+    warnings.filterwarnings("ignore")
 
-###########################################
-#TEXT COMPRESSOR FUNCTION CALLS
-HANDICAP = 1.0 #Choose your handicap value!
+if __name__=='__main__':
+    mp.freeze_support()
 
-#Uncomment for an interactive demonstration of various text quality and lengths, with a handicap of your choice
-#textcompressor.demo(HANDICAP) 
+    #Uncomment for an interactive demonstration of various text quality and lengths, with a handicap of your choice
+    #HANDICAP = 1.0 #Choose your handicap value!
+    #textcompressor.demo(HANDICAP) 
 
-#Uncomment to sample your own text with a handicap of your own choice (without parallel processing)
-#textcompressor.run_personal_demo(HANDICAP, text) 
+    #Uncomment to sample your own text with a handicap of your own choice (WITHOUT parallel processing)
+    #HANDICAP = 1.0 #Choose your handicap value!
+    #text = open(<Insert your text file path here>, 'r', encoding='utf-8').read()
+    #textcompressor.run_personal_demo(HANDICAP, text) 
 
-#Uncomment to sample your own text (with parallel processing)
-#textcompressor.run(text)
-###########################################
+    #Uncomment to sample your own text (WITH parallel processing)
+    #text = open('The_Great_Gatsby.txt', 'r', encoding='utf-8').read() #The Great gatsby, ~47,000 words.
+    #text = open('GLOWROT.txt', 'r', encoding='utf-8').read()
+    text = open('Beneath the Urban Stars.txt', 'r', encoding='utf-8').read()
+    summary = textcompressor.run(text)
+    print(summary)
+
 
 ###########################################
 #CLASSIFIER FUNCTION CALLS (Featuring elmo!)
-
+'''
 if __name__ == '__main__':
     corpus = [
              ' '.join(brown.words(fileids=['cl13'])),
@@ -70,4 +79,4 @@ if __name__ == '__main__':
         print("******************************************")
         print("\nembeddeding: \n",embedding)
         print("******************************************")
-###########################################
+###########################################'''

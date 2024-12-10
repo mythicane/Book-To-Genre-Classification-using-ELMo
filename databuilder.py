@@ -32,6 +32,11 @@ from textcompressor import *
 import numpy
 import tensorflow
 from tqdm import tqdm
+import sys
+
+if not sys.warnoptions: #Suppresses warnings3
+    import warnings
+    warnings.filterwarnings("ignore")
 
 def load_dataframe():
     """To be executed once! Cleans up the publically available available dataset and saves it as a .cvs
@@ -65,25 +70,23 @@ def load_dataframe():
     df_updated.to_csv('books_and_genres_cleaned.csv', index=False)
 
 def add_embeddings():
-    df = pd.read_csv('books_and_genres_cleaned.csv')
+    df = pd.read_csv('books_and_genres_cleaned.csv', nrows=100) #read only the first 100 rows, for simplicity sake
     elmo = elmo_init()
     embeddings = []
     for _,s in enumerate(tqdm(df['text'])): 
         try:
-            #ERROR: too long to run, potentially because "run_personal_demo" is struggling....
-            #adding the embeddings is bottle-necked by figuring out how parallel processing works in python.
-            compressed = run_personal_demo(1.25, s) #replace "run_personal_demo" with "run" after establishing parallelism.
+            compressed = run(s) 
             embedding = elmo_embed(elmo, compressed)
             embeddings.append(embedding['elmo'].numpy().flatten())
         except:
-            print("error encountered!!")
+            print("Embedding Generation Error Encountered!!")
             embeddings.append(numpy.zeros(283648,))
     try:    
         np_embeddings = np.array(embeddings)
         df['elmo_embeddings'] = np_embeddings
-        df.to_csv('books_genres_and_embeddings.csv', index=False)
+        df.to_csv('C:\\Users\\661994646\\Documents\\GitHub\\Book-To-Genre-using-ML\\books_genres_and_embeddings.csv', index=False)
     except:
-        print("error encountered!!")
+        print("Saving to .CVS Error Encountered!!")
 
     breakpoint()
 

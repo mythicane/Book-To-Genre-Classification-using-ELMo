@@ -14,14 +14,17 @@ from joblib import dump #for saving a model
 from joblib import load #for loading a model
 from elmo import * #for generating an embedding
 from textcompressor import * #for generating an embedding
+from sklearn.impute import SimpleImputer
 
 def logistic():
     "Creates a logistic regression model with a One-Vs-The-Rest classifier approach"
 
     #Creates data in the form of embeddings (x) and genre labels (y)
-    df = pd.read_csv('books_genres_and_embeddings.csv') #reads in the embeddings dataframe created from databuilder.py
-    X = np.vstack(df["elmo_embeddings"].values)
-    mlb = MultiLabelBinarizer()
+    df = pd.read_csv('books_genres_and_embeddings.csv',skiprows=[1]) #reads in the embeddings dataframe created from databuilder.py
+    #X = np.vstack(df["elmo_embeddings"].values)
+
+    df["doc_vectr"] = pd.to_numeric(df['doc_vectr'], errors='coerce')
+    X = np.vstack(df["doc_vectr"].values) #temporary demo solution, as ELMO embeddings is generating...
     y = MultiLabelBinarizer().fit_transform(df["genres"]) #this turns the genres into a binary basis matrix... makes it easier to learn!
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
@@ -39,7 +42,8 @@ def adaboost():
     """Creates an AdaBoost model with a One-Vs-The-Rest classifier approach and a Logistic Regression Base"""
     #Creates data in the form of embeddings (x) and genre labels (y)
     df = pd.read_csv('books_genres_and_embeddings.csv') #reads in the embeddings dataframe created from databuilder.py
-    X = np.vstack(df["elmo_embeddings"].values)
+    #X = np.vstack(df["elmo_embeddings"].values)
+    X = np.vstack(df["doc_vectr"].values) #temporary demo solution, as ELMO embeddings is generating...
     mlb = MultiLabelBinarizer()
     y = MultiLabelBinarizer().fit_transform(df["genres"]) #this turns the genres into a binary basis matrix... makes it easier to learn!
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -60,10 +64,10 @@ def predict(model, emb):
     prediction = model.predict(emb) 
     return prediction
 
-def get_embeddings(text):
+def get_embeddings_elmo(text):
     elmo = elmo_init()
     embeddings = []
-    compressed = run_personal_demo(1.25, text) #replace "run_personal_demo" with "run" after establishing parallelism.
+    compressed = run(text) 
     embedding = elmo_embed(elmo, compressed)
     embeddings.append(embedding['elmo'].numpy().flatten())
     return embeddings
@@ -71,10 +75,14 @@ def get_embeddings(text):
 if __name__ == "__main__":
     #builds a logistic regression model and saves it as "logistic_regression_model.joblib"
     #also prints out the classification report while building
-    
+        
+    if not sys.warnoptions: #Suppresses warnings3
+        import warnings
+        warnings.filterwarnings("ignore") 
+
     #get an example embedding
     text = open('Carnegie_Loves_me_Draft.txt', 'r').read() # "Carnegie Loves me!" w/ a word count of ~6,000...'
-    emb = get_embeddings(text)
+    emb = get_embeddings_elmo(text)
 
     logistic() 
     loaded_model = load("logistic_regression_model.joblib")
@@ -82,9 +90,9 @@ if __name__ == "__main__":
 
     #builds an Adaboost regression model and saves it as "adaboost_model.joblib"
     #also prints out the classification report while building
-    adaboost()
-    loaded_model = load("adaboost_model.joblib")
-    print("The Adaboost regression pred is..." ,predict(loaded_model, emb)) #returns a prediction given a model and an embedding
+    #adaboost()
+    #loaded_model = load("adaboost_model.joblib")
+    #print("The Adaboost regression pred is..." ,predict(loaded_model, emb)) #returns a prediction given a model and an embedding
 
     #Compare predictions... is there a difference? Choose the one with the better predictions and classification report!
 

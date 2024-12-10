@@ -40,6 +40,11 @@ import pandas as pd
 import tensorflow_hub as hub
 import numpy as np
 import databuilder
+import sys
+
+if not sys.warnoptions: #Suppresses warnings3
+    import warnings
+    warnings.filterwarnings("ignore")
 
 def elmo_init():
     '''Returns an Elmo Object'''

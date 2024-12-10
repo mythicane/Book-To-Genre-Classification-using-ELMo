@@ -48,10 +48,15 @@ import numpy as np
 from nltk.corpus import stopwords, gutenberg, wordnet, brown
 import multiprocessing #for optimization and speed efforts
 import sys #for the suppression of warnings
+import time
+from multiprocessing import Pool
+import threading
+
+summaries = [] #the global variable!
 
 if not sys.warnoptions: #Suppresses warnings3
     import warnings
-    warnings.simplefilter("ignore")
+    warnings.filterwarnings("ignore")
 
 def remove_punctuation_marks(text):
     """When given a text (as a string), returns the same text, but without punctuation marks."""
@@ -202,6 +207,8 @@ def demo(HANDICAP):
 
 def process_chunk(chunk):
         """Processes a single chunk of text to generate its summary."""
+        from nltk.corpus import wordnet as wn
+        wn.ensure_loaded()
         documents = nltk.sent_tokenize(chunk)
         HANDICAP = 1.2 #THIS HANDICAP WAS CHOSEN BECAUSE IT WORKS TE BEST WITH TEXTS APPROX. 2,000 WORDS IN LENGTH!! (See documentation)
         tfidf_results = TfidfVectorizer(tokenizer=get_lemmatized_tokens, stop_words=stopwords.words('english')).fit_transform(documents)
@@ -228,18 +235,14 @@ def run(text):
         chunks = [' '.join(words[i:i + 2000]) for i in range(0, len(words), 2000)]
     else:
         chunks = [text]  #If the text is less than 2000 words, process it as a single chunk
-
-    ###########################################
-    #UNDER CONSTRUCTION: PARALLEL PROCESSING!!!
-    #Utilizes parallel processing to effectively process each chunk through the compressor.
-    with multiprocessing.Pool() as pool: #assumes the # of processes = # of cores in system
+        
+    with Pool(processes=multiprocessing.cpu_count()) as pool:
         summaries = pool.map(process_chunk, chunks)
-    ###########################################
-
+ 
     #Combine the summaries of all the chunks to get a mega-summary.
     mega_summary = ' '.join(summaries)
 
-    #if the mega-summary exceeds 10,000 words, rerun the program until the summary is under 600 words...
-    while len(mega_summary.split()) > 600:
+    #if the mega-summary exceeds 5,000 words, rerun the program until the summary is 10,000 words...
+    while len(mega_summary.split()) > 4000:
         mega_summary = run(mega_summary)  #recursively reprocess the mega-summary
     return mega_summary #returns the summary as a string!
