@@ -70,7 +70,7 @@ def load_dataframe():
     df_updated.to_csv('books_and_genres_cleaned.csv', index=False)
 
 def add_embeddings():
-    df = pd.read_csv('books_and_genres_cleaned.csv', nrows=100) #read only the first 100 rows, for simplicity sake
+    df = pd.read_csv('books_and_genres_cleaned.csv', nrows=200) #read only the first 100 rows, for simplicity sake
     elmo = elmo_init()
     embeddings = []
     for _,s in enumerate(tqdm(df['text'])): 
@@ -82,11 +82,13 @@ def add_embeddings():
             print("Embedding Generation Error Encountered!!")
             embeddings.append(numpy.zeros(283648,))
     try:    
-        np_embeddings = np.array(embeddings)
-        df['elmo_embeddings'] = np_embeddings
-        df.to_csv('C:\\Users\\661994646\\Documents\\GitHub\\Book-To-Genre-using-ML\\books_genres_and_embeddings.csv', index=False)
+        df['elmo_embeddings'] = embeddings
+        df.to_pickle('data.pkl')
+        print("Updated data.pkl...")
+        #df.to_csv('C:\\Users\\661994646\\Documents\\GitHub\\Book-To-Genre-using-ML\\books_genres_and_embeddings_test.csv', index=False)
     except:
-        print("Saving to .CVS Error Encountered!!")
+        #print("Saving to .CVS Error Encountered!!")
+        print("Saving to .PKL file Error Encountered!!")
 
     breakpoint()
 

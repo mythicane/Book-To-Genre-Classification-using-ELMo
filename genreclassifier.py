@@ -20,11 +20,12 @@ def logistic():
     "Creates a logistic regression model with a One-Vs-The-Rest classifier approach"
 
     #Creates data in the form of embeddings (x) and genre labels (y)
-    df = pd.read_csv('books_genres_and_embeddings.csv',skiprows=[1]) #reads in the embeddings dataframe created from databuilder.py
+    #df = pd.read_csv('books_genres_and_embeddings.csv',skiprows=[1]) #reads in the embeddings dataframe created from databuilder.py
     #X = np.vstack(df["elmo_embeddings"].values)
+    df = pd.read_pickle('data.pkl')  
 
-    df["doc_vectr"] = pd.to_numeric(df['doc_vectr'], errors='coerce')
-    X = np.vstack(df["doc_vectr"].values) #temporary demo solution, as ELMO embeddings is generating...
+    df["elmo_embeddings"] = pd.to_numeric(df['elmo_embeddings'], errors='coerce')
+    X = np.vstack(df["elmo_embeddings"].values) #temporary demo solution, as ELMO embeddings is generating...
     y = MultiLabelBinarizer().fit_transform(df["genres"]) #this turns the genres into a binary basis matrix... makes it easier to learn!
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
@@ -41,8 +42,10 @@ def logistic():
 def adaboost():
     """Creates an AdaBoost model with a One-Vs-The-Rest classifier approach and a Logistic Regression Base"""
     #Creates data in the form of embeddings (x) and genre labels (y)
-    df = pd.read_csv('books_genres_and_embeddings.csv') #reads in the embeddings dataframe created from databuilder.py
+    #df = pd.read_csv('books_genres_and_embeddings.csv') #reads in the embeddings dataframe created from databuilder.py
     #X = np.vstack(df["elmo_embeddings"].values)
+    df = pd.read_pickle('data.pkl')  
+
     X = np.vstack(df["doc_vectr"].values) #temporary demo solution, as ELMO embeddings is generating...
     mlb = MultiLabelBinarizer()
     y = MultiLabelBinarizer().fit_transform(df["genres"]) #this turns the genres into a binary basis matrix... makes it easier to learn!
