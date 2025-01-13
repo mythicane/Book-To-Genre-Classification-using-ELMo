@@ -242,7 +242,11 @@ def run(text):
     #Combine the summaries of all the chunks to get a mega-summary.
     mega_summary = ' '.join(summaries)
 
-    #if the mega-summary exceeds 5,000 words, rerun the program until the summary is 10,000 words...
-    while len(mega_summary.split()) > 4000:
+    #if the mega-summary exceeds 2,000 words, rerun the program until the summary is 2,000 words...
+    while len(mega_summary.split()) > 2000:
         mega_summary = run(mega_summary)  #recursively reprocess the mega-summary
     return mega_summary #returns the summary as a string!
+
+if __name__ == "__main__":
+    HANDICAP = 1.5
+    demo(HANDICAP)

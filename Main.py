@@ -55,28 +55,3 @@ if __name__=='__main__':
     summary = textcompressor.run(text)
     print(summary)
 
-
-###########################################
-#CLASSIFIER FUNCTION CALLS (Featuring elmo!)
-'''
-if __name__ == '__main__':
-    corpus = [
-             ' '.join(brown.words(fileids=['cl13'])),
-             ' '.join(brown.words(fileids=['cm01'])),
-             ' '.join(brown.words(fileids=['cn15'])),
-             ' '.join(brown.words(fileids=['cp12'])),
-             ' '.join(brown.words(fileids=['cr06']))
-    ]
-
-    elmo = elmo_module.init()
-    for i,raw_text in enumerate(corpus):
-        compressed_text = textcompressor.run(HANDICAP, raw_text) #this will formally run the compressor
-        embedding = elmo_module.embed(elmo, compressed_text)
-        print("******************************************")
-        print("\nRaw text len: \n",len(raw_text))
-        print("******************************************")
-        print("\nCompressed text: \n",len(compressed_text))
-        print("******************************************")
-        print("\nembeddeding: \n",embedding)
-        print("******************************************")
-###########################################'''

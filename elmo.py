@@ -39,7 +39,7 @@ import tensorflow.compat.v1 as tf
 import pandas as pd
 import tensorflow_hub as hub
 import numpy as np
-import databuilder
+from nltk.corpus import brown
 import sys
 
 if not sys.warnoptions: #Suppresses warnings3
@@ -55,8 +55,32 @@ def elmo_embed(elmo, s):
     ''' Given an Elmo Object and a String "S", returns Elmo-Generated string embeddings.'''
     string_tensor = tf.constant([s])
     return elmo.signatures["default"](string_tensor)
+
+def demo(): #refine demonstration.. it is crude so far!
+    corpus = [
+             ' '.join(brown.words(fileids=['cl13'])),
+             ' '.join(brown.words(fileids=['cm01'])),
+             ' '.join(brown.words(fileids=['cn15'])),
+             ' '.join(brown.words(fileids=['cp12'])),
+             ' '.join(brown.words(fileids=['cr06']))
+    ]
+
+    elmo = elmo_module.init()
+    for i,raw_text in enumerate(corpus):
+        compressed_text = textcompressor.run(HANDICAP, raw_text) #this will formally run the compressor
+        embedding = elmo_module.embed(elmo, compressed_text)
+        print("******************************************")
+        print("\nRaw text len: \n",len(raw_text))
+        print("******************************************")
+        print("\nCompressed text: \n",len(compressed_text))
+        print("******************************************")
+        print("\nembeddeding: \n",embedding)
+        print("******************************************")
     
 if __name__ == "__main__":
     elmo = elmo_init()
+    print("ELMO.py has executed, and ELmo has successfully initialized.")
+    print("The ELmo embedding for 'Hello World!' is the following...")
     embedding = elmo_embed(elmo, "Hello World!")
     print(embedding)
+    print("Demonstration concluded.")

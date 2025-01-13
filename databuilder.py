@@ -57,8 +57,8 @@ def load_dataframe():
 
     #Replace the NaN values in the 'text' column of the original dataframe
     df_updated['text'] = df_updated['text_y']
-    df_updated = df_updated.drop(columns=['text_y'])  # Drop the additional column created during merge
-    df_updated.rename(columns={'text_x': 'textnew'}, inplace=True)  # Rename back to original if needed
+    df_updated = df_updated.drop(columns=['text_y'])  #Drop the additional column created during merge
+    df_updated.rename(columns={'text_x': 'textnew'}, inplace=True)  #Rename back to original if needed
     df_updated= df_updated.iloc[:, list(range(4)) + list(range(-3, 0))]
     df_updated = df_updated.drop(columns=['textnew'], errors='ignore')
 
@@ -70,7 +70,7 @@ def load_dataframe():
     df_updated.to_csv('books_and_genres_cleaned.csv', index=False)
 
 def add_embeddings():
-    df = pd.read_csv('books_and_genres_cleaned.csv', nrows=200) #read only the first 100 rows, for simplicity sake
+    df = pd.read_csv('books_and_genres_cleaned.csv') #nrows = 100... read only the first 100 rows, for simplicity sake
     elmo = elmo_init()
     embeddings = []
     for _,s in enumerate(tqdm(df['text'])): 
@@ -85,11 +85,10 @@ def add_embeddings():
         df['elmo_embeddings'] = embeddings
         df.to_pickle('data.pkl')
         print("Updated data.pkl...")
-        #df.to_csv('C:\\Users\\661994646\\Documents\\GitHub\\Book-To-Genre-using-ML\\books_genres_and_embeddings_test.csv', index=False)
     except:
         #print("Saving to .CVS Error Encountered!!")
         print("Saving to .PKL file Error Encountered!!")
-
+    print("Here's the breakpoint: PLEASE Triple Check that your data has loaded correctly!")
     breakpoint()
 
 if __name__ == "__main__":
