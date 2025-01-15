@@ -24,7 +24,7 @@ def get_data():
     '''Grabs data pickled from databuilder.py and converts it into "x" and "y" data arrays.'''
     #datasampler.pkl = 200 pts of randomly selected books... NOT balanced
     #data.pkl = full dataset... balanced, approx 1300 pts.
-    df = pd.read_pickle('data.pkl') #reads pickle file generated from "databuilder.py"
+    df = pd.read_pickle('datasampler.pkl') #reads pickle file generated from "databuilder.py"
 
     df = df[df["elmo_embeddings"].apply(lambda x: not np.all(x == 0))] #removes datapoints where the embedding is all zeroes...
 
@@ -74,8 +74,11 @@ def reduce_dimensions(X):
     X_scaled = scaler.fit_transform(X)
 
     # Step 2: Apply PCA to reduce dimensions to 191 (limit = min(n_datapoints, n_features))
-    pca = PCA(n_components=1000)
+    pca = PCA(n_components=191)
     X_reduced = pca.fit_transform(X_scaled)
+
+    with open("pca_model.pkl", "wb") as f:
+        pickle.dump(pca, f)
 
     # Check the shape of the reduced data
     print("Original shape:", X.shape)
@@ -84,22 +87,6 @@ def reduce_dimensions(X):
     #Check the varience
     explained_variance_ratio = pca.explained_variance_ratio_
     print("Total PCA variance explained:", np.sum(explained_variance_ratio))
-
-    #FOR TRUNCATED SVD...
-    #n_components = 13000  # Target number of dimensions
-    #svd = TruncatedSVD(n_components=n_components, random_state=42)
-
-    # Perform the dimensionality reduction
-    #X_reduced = svd.fit_transform(X_scaled)
-
-    # Print the result
-    #print(f"Reduced shape of Truncated SVD: {X_reduced.shape}")
-    #explained_variance = svd.explained_variance_ratio_.sum()
-    #print(f"Explained variance ratio: {explained_variance:.2f}")
-
-    #NOTICE: If the explained variance ratio is low, 
-    # you might want to reduce the number of dimensions 
-    # or explore other methods like autoencoders.
 
     return X_reduced
 
@@ -128,35 +115,25 @@ def predict(text, model_name):
     with open('mlb.pkl', 'rb') as f:
         mlb = pickle.load(f)
 
+    #loads PCA (to fit prediction into new dimensions)
+    with open("pca_model.pkl", "rb") as f:
+        pca = pickle.load(f)
+
     #generates a summary, then an embedding, given a text
     emb = get_embeddings_elmo(text)
     emb = emb[0]
     emb = np.pad(emb, (0, max_length - len(emb)), 'constant') 
     emb = emb.reshape(1, -1)
+    emb = pca.transform(emb)
 
     #makes a prediction!
     pred = model.predict_proba(emb)
     pred = pred.tolist()
     pred = pred[0]
+    print("BOOK: The Great Gatsby." )
     print("The Predictions for the given model is as follows..." ) #returns a prediction given a model and an embedding
     for i in range(len(pred)):
-        print(mlb.classes_[i], "::", pred[i]*100, "%")
-    breakpoint()
-
-def build_svc():
-    """Creates a SVC (Support Vector Classifier) model with a One-Vs-The-Rest classifier approach (using Multi-Label Binarizer for
-    Multi-Genre classification), then saves it for execution."""
-
-    y, X, max_length = get_data()
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-    #Creates SVC model with OneVsRestClassifier...
-    model = OneVsRestClassifier(SVC(kernel='rbf', gamma = 1)) #dataset too dimensionally large... what to do...
-
-    model.fit(X, y) #stalling right here... I should time it.
-    with open('svcmodel.pkl','wb') as f:
-        pickle.dump(model, f)
-        pickle.dump(max_length, f)
+        print(f"{mlb.classes_[i]} :: {pred[i]*100:.4f} %")
 
 def build_logistic():
     """Creates a logistic regression model with a One-Vs-The-Rest classifier approach (using Multi-Label Binarizer for
@@ -165,19 +142,30 @@ def build_logistic():
     Notes: Accuracy is lackluster. Logistical regression models do not function as well with feature lengths of 
     over 1,000 datapoints."""
 
+    start_time = time.time()
     y, X, max_length = get_data()
- 
-    #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print(f"Elapsed time of Data Fetching: {elapsed_time:.6f} seconds")
+
+    start_time = time.time()
+    X = reduce_dimensions(X)
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print(f"Elapsed time of Dimension Reduction: {elapsed_time:.6f} seconds")
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
     #Creates a Logistic Regression model with OneVsRestClassifier....
     #The Higher the "C" value, the more closely the model will fit the data.
-    model = OneVsRestClassifier(LogisticRegression(class_weight='balanced', C=0.1, max_iter = 1000)) #works but not too accurate
 
-    model.fit(X, y) #stalling right here... I should time it.
+    model = OneVsRestClassifier(LogisticRegression(class_weight='balanced', C=0.4, max_iter = 10000)) #works but not too accurate
 
-    #model.fit(X_train, y_train)
-    #y_pred = model.predict(X_test)  
-    #print(classification_report(y_test, y_pred, zero_division=0))
+    #model.fit(X, y) #stalling right here... I should time it.
+
+    model.fit(X_train, y_train)
+    y_pred = model.predict(X_test)  
+    print(classification_report(y_test, y_pred, zero_division=0))
 
     with open('logisticmodel.pkl','wb') as f:
         pickle.dump(model, f)
@@ -192,42 +180,24 @@ if __name__ == "__main__":
         warnings.filterwarnings("ignore") 
 
     #Builds model... uncomment and run this ONCE
-    #build_svc()
     #build_logistic()
-    start_time = time.time()
-    y, X, max_length = get_data()
-    end_time = time.time()
-    elapsed_time = end_time - start_time
-    print(f"Elapsed time of Data Fetching: {elapsed_time:.6f} seconds")
-
-    breakpoint()
-
-    start_time = time.time()
-    result = visualize_genres(y)
-    end_time = time.time()
-    elapsed_time = end_time - start_time
-    print(f"Elapsed time of Data Vsualization: {elapsed_time:.6f} seconds")
-
-    breakpoint()
-
-    start_time = time.time()
-    X = reduce_dimensions(X)
-    end_time = time.time()
-    elapsed_time = end_time - start_time
-    print(f"Elapsed time of Dimension Reduction: {elapsed_time:.6f} seconds")
-
-    breakpoint()
 
     #Make an official prediction! Uncomment the sample text that you want to use
     #text = open('Carnegie_Loves_me_Draft.txt', 'r').read() #"Carnegie Loves me!" w/ a word count of ~6,000...'
     #text = open('Thundered_In_Act_One.txt', 'r').read() # "Thundered In: Act One" w/ a word count of ~9,000...'
     #text = open('Falon_Winters_Timeline.txt', 'r').read() # "Falon Winters: A Timeline" w/ a word count of ~10,000...'
     #text = open('AIR_Draft.txt', 'r').read() # "The AIR Models" w/ a word count of ~13,800...'
-    #text = open('The_Great_Gatsby.txt', 'r', encoding='utf-8').read() # "The Great Gatsby" w/ a word count of ~47,800...'
+    text = open('The_Great_Gatsby.txt', 'r', encoding='utf-8').read() # "The Great Gatsby" w/ a word count of ~47,800...'
+    #text = open('Beneath_the_Urban_Stars.txt', 'r', encoding='utf-8').read() # "Beneath the Urban Stars" by Beatrice...
+    #text = open('GLOWROT.txt', 'r', encoding='utf-8').read() # "GLOWROT" by Beatrice...
 
     #Uncomment the model type that you want to use
-    #model_name = "logistic"
+    model_name = "logistic"
     #model_name = "svc"
 
     #Executes a prediction
-    #predict(text, model_name)
+    start_time = time.time()
+    predict(text, model_name)
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print(f"Elapsed time of Prediction: {elapsed_time:.6f} seconds")
