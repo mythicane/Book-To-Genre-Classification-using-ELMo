@@ -181,14 +181,12 @@ if __name__ == "__main__":
     #Builds model... uncomment and run this ONCE
     #build_logistic()
 
-    #Make an official prediction! Uncomment the sample text that you want to use
-    #text = open('Carnegie_Loves_me_Draft.txt', 'r').read() #"Carnegie Loves me!" w/ a word count of ~6,000...'
-    #text = open('Thundered_In_Act_One.txt', 'r').read() # "Thundered In: Act One" w/ a word count of ~9,000...'
-    #text = open('Falon_Winters_Timeline.txt', 'r').read() # "Falon Winters: A Timeline" w/ a word count of ~10,000...'
-    #text = open('AIR_Draft.txt', 'r').read() # "The AIR Models" w/ a word count of ~13,800...'
-    text = open('The_Great_Gatsby.txt', 'r', encoding='utf-8').read() # "The Great Gatsby" w/ a word count of ~47,800...'
-    #text = open('Beneath_the_Urban_Stars.txt', 'r', encoding='utf-8').read() # "Beneath the Urban Stars" by Beatrice...
-    #text = open('GLOWROT.txt', 'r', encoding='utf-8').read() # "GLOWROT" by Beatrice...
+    #Make an official prediction! Uses the bundled Great Gatsby sample by default, or
+    #a .txt file of your own choosing.
+    path = input('Enter a .txt file path to classify [default: The_Great_Gatsby.txt]... > ').strip()
+    if not path:
+        path = 'The_Great_Gatsby.txt'
+    text = open(path, 'r', encoding='utf-8').read()
 
     #Uncomment the model type that you want to use
     model_name = "logistic"

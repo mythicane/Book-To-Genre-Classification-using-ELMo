@@ -99,110 +99,70 @@ def get_summary(documents, tfidf_results, HANDICAP):
     return summary
 
 def demo(HANDICAP):
-    """Runs a simple demonstration of the algorithm with a given Handicap against a sample of a
-    novel derived from the NLTK Open Source Brown Dataset, OR a less-professional "hobby" text by
-    Greta Perez-Haiek."""
+    """Runs a simple demonstration of the algorithm with a given Handicap, against the
+    bundled sample text ("The Great Gatsby"), a public-domain excerpt from the NLTK Brown
+    corpus, or a .txt file of your own choosing."""
 
     print("******************************************")
     print("Text-Compressor DEMO running...\n")
     print("******************************************")
     print("Hello, welcome to the Storyforge Text Compressor Demonstration!")
-    response = input("Would you like to review fan-made literature or classical literature? [f/c]...> ")
-    if response == "f": #for less professional texts
-        while True:
-            print("Specify the book that you would like to compress...")
-            print("")
-            print('[1] - Genre: Tragiromance...	Greta\'s "Carnegie Loves me!" (6,000 words)')
-            print('[2] - Genre: Action Science Fiction Screenplay...	Greta\'s "Thundered In - ACT ONE" (9,000 words)')
-            print('[3] - Genre: Action-Packed Space Opera...	Greta\'s "Falon Winters" (10,000 words)')
-            print('[4] - Genre: Slice of Life Sci-Fi...	Greta\'s "The A.I.R Models" (13,000 words)')
-            print('[5] - Genre: Classical Literature...	"The Great Gatsby" (48,000 words)')
-            num = input('Choose a number from the above... > ')
-            if num == str(1):
-                text = open('Carnegie_Loves_me_Draft.txt', 'r').read() # "Carnegie Loves me!" w/ a word count of ~6,000...'
-            elif num == str(2):
-                text = open('Thundered_In_Act_One.txt', 'r').read() # "Thundered In: Act One" w/ a word count of ~9,000...'
-            elif num == str(3):
-                text = open('Falon_Winters_Timeline.txt', 'r').read() # "Falon Winters: A Timeline" w/ a word count of ~10,000...'
-            elif num == str(4):
-                text = open('AIR_Draft.txt', 'r').read() # "The AIR Models" w/ a word count of ~13,800...'
-            elif num == str(5):
-                text = open('The_Great_Gatsby.txt', 'r', encoding='utf-8').read() # "The Great Gatsby" w/ a word count of ~47,800...'
-            else:
-                print("Invalid Number! Restarting Demo...")
-                continue
-            print("")
-            print('TESTING WITH THE FAN-TEXT SELECTED...')
-            print("")
-            print("******************************************")
-            print("The origional text is the following....")
-            print('')
-            print(text)
-            print("")
-            print("The End.")
-            print("******************************************")
-            print("The condensed text is the following....")
-            print('')
-            print(run_personal_demo(HANDICAP, text))
-            print('')
-            print("The End.")
-            print("******************************************")
-            print("DEMONSTRATION CONCLUDED. Would you like to try another Fan Written text?")
-            decision = input('[y/n]...> ')
-            if decision == "y":
-                continue
-            else:
-                print("Terminating demonstration.")
-                break
-    elif response == "c": #for more professional literature
-        while True:
-            print("")
-            print("Specify the book that you would like to compress...")
+    while True:
+        print("")
+        print("Specify the text that you would like to compress...")
+        print("")
+        print('[1] - "The Great Gatsby" (bundled sample, ~47,800 words)')
+        print('[2] - A public-domain excerpt from the NLTK Brown corpus')
+        print('[3] - Your own .txt file')
+        num = input('Choose a number from the above... > ')
+        if num == str(1):
+            text = open('The_Great_Gatsby.txt', 'r', encoding='utf-8').read()
+        elif num == str(2):
             print("")
             print('[1] - Genre: Mystery...	Hitchens\'s "Footsteps in the Night"')
             print('[2] - Genre: Science Fiction...	Heinlein\'s "Stranger in a Strange Land"')
             print('[3] - Genre: Adventure...	Field\'s "Rattlesnake Ridge"')
             print('[4] - Genre: Romance...	Callaghan\'s "A Passion in Rome"')
             print('[5] - Genre: Humor...	Thurber\'s "The Future, If Any, of Comedy"')
-            num = input('Choose a number from the above... > ')
-            if num == str(1):
-                text = ' '.join(brown.words(fileids=['cl13']))
-            elif num == str(2):
-                text = ' '.join(brown.words(fileids=['cm01']))
-            elif num == str(3):
-                text = ' '.join(brown.words(fileids=['cn15']))
-            elif num == str(4):
-                text = ' '.join(brown.words(fileids=['cp12']))
-            elif num == str(5):
-                text = ' '.join(brown.words(fileids=['cr06']))
-            else:
+            brown_num = input('Choose a number from the above... > ')
+            brown_fileids = {'1': 'cl13', '2': 'cm01', '3': 'cn15', '4': 'cp12', '5': 'cr06'}
+            if brown_num not in brown_fileids:
                 print("Invalid Number! Restarting Demo...")
                 continue
-            print("")
-            print('TESTING WITH THE BROWN DATASET NOVEL SELECTED...')
-            print("")
-            print("******************************************")
-            print("The origional text is the following....")
-            print('')
-            print(text)
-            print("")
-            print("The End.")
-            print("******************************************")
-            print("The condensed text is the following....")
-            print('')
-            print(run_personal_demo(HANDICAP, text))
-            print('')
-            print("The End.")
-            print("******************************************")
-            print("DEMONSTRATION CONCLUDED. Would you like to try another novel?")
-            decision = input('[y/n]...> ')
-            if decision == "y":
+            text = ' '.join(brown.words(fileids=[brown_fileids[brown_num]]))
+        elif num == str(3):
+            path = input('Enter the path to your .txt file... > ')
+            try:
+                text = open(path, 'r', encoding='utf-8').read()
+            except (OSError, UnicodeDecodeError) as error:
+                print(f"Couldn't read that file ({error}). Restarting Demo...")
                 continue
-            else:
-                print("Terminating demonstration.")
-                break
-    else:
-        print("Invalid Response! Terminating demonstration.")
+        else:
+            print("Invalid Number! Restarting Demo...")
+            continue
+        print("")
+        print('TESTING WITH THE SELECTED TEXT...')
+        print("")
+        print("******************************************")
+        print("The original text is the following....")
+        print('')
+        print(text)
+        print("")
+        print("The End.")
+        print("******************************************")
+        print("The condensed text is the following....")
+        print('')
+        print(run_personal_demo(HANDICAP, text))
+        print('')
+        print("The End.")
+        print("******************************************")
+        print("DEMONSTRATION CONCLUDED. Would you like to try another text?")
+        decision = input('[y/n]...> ')
+        if decision == "y":
+            continue
+        else:
+            print("Terminating demonstration.")
+            break
     return 0 #returns null
 
 def process_chunk(chunk):

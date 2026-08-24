@@ -46,12 +46,14 @@ if __name__=='__main__':
     #Uncomment to sample your own text with a handicap of your own choice (WITHOUT parallel processing)
     #HANDICAP = 1.0 #Choose your handicap value!
     #text = open(<Insert your text file path here>, 'r', encoding='utf-8').read()
-    #textcompressor.run_personal_demo(HANDICAP, text) 
+    #textcompressor.run_personal_demo(HANDICAP, text)
 
-    #Uncomment to sample your own text (WITH parallel processing)
-    #text = open('The_Great_Gatsby.txt', 'r', encoding='utf-8').read() #The Great gatsby, ~47,000 words.
-    #text = open('GLOWROT.txt', 'r', encoding='utf-8').read()
-    text = open('Beneath the Urban Stars.txt', 'r', encoding='utf-8').read()
+    #Runs the compressor (WITH parallel processing) on either the bundled Great Gatsby
+    #sample or a .txt file of your own choosing.
+    path = input('Enter a .txt file path to compress [default: The_Great_Gatsby.txt]... > ').strip()
+    if not path:
+        path = 'The_Great_Gatsby.txt'
+    text = open(path, 'r', encoding='utf-8').read()
     summary = textcompressor.run(text)
     print(summary)
 

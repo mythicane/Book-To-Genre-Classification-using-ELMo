@@ -63,9 +63,9 @@ sentence it keeps is copied verbatim from the input.
 
 Three ways to run it, all currently commented out at the bottom of the file:
 
-- `demo(HANDICAP)` — interactive terminal demo; prompts you to pick a sample
-  text (fan drafts included in this repo, or Brown-corpus excerpts) and prints
-  the before/after.
+- `demo(HANDICAP)` — interactive terminal demo; prompts you to pick the bundled
+  `The_Great_Gatsby.txt` sample, a public-domain excerpt from NLTK's Brown
+  corpus, or the path to your own `.txt` file, then prints the before/after.
 - `run_personal_demo(HANDICAP, text)` — single-pass compression on your own
   text string, no parallelism, handicap of your choosing.
 - `run(text)` — the production path used by the rest of the pipeline. Splits
@@ -76,12 +76,11 @@ Three ways to run it, all currently commented out at the bottom of the file:
 Run standalone: uncomment your choice of the three calls at the bottom of
 `textcompressor.py` and run `python textcompressor.py`.
 
-The only sample manuscript included in this repo is `The_Great_Gatsby.txt`.
-`demo(HANDICAP)`'s interactive "fan-made literature" branch (`[f]`) references
-a few personal drafts that aren't checked into this repo, so those menu
-options won't find a file — use the "classical literature" branch (`[c]`,
-Brown-corpus excerpts) or `run_personal_demo()`/`run()` with your own text
-instead.
+The only sample manuscript checked into this repo is `The_Great_Gatsby.txt`
+(public domain) — no personal test manuscripts are included, since uploading a
+book dataset to a public repo isn't great practice. To try the pipeline on
+your own writing, just point `demo()` at your own `.txt` file when prompted
+(or pass it directly to `run_personal_demo()`/`run()`).
 
 ## 2. `elmo.py` — embeddings
 
@@ -146,16 +145,13 @@ lets you run predictions on new text.
   text the same way training data was processed; and prints a probability per
   genre.
 
-Typical run order (uncomment the relevant lines at the bottom of the file):
+Typical run order:
 
-1. `build_logistic()` once, to train and save the model + PCA + label
-   binarizer.
-2. Point `text = open(<your file>, 'r').read()` at whatever manuscript you
-   want classified, set `model_name = "logistic"`, and run
-   `python genreclassifier.py` to get per-genre probabilities.
-
-`predict()` can be pointed at `The_Great_Gatsby.txt` (the sample included in
-this repo) or any manuscript of your own.
+1. Uncomment `build_logistic()` at the bottom of the file and run it once, to
+   train and save the model + PCA + label binarizer.
+2. Run `python genreclassifier.py` — it prompts for a `.txt` file path (just
+   press Enter to use the bundled `The_Great_Gatsby.txt` sample) and prints
+   per-genre probabilities for whatever text you point it at.
 
 ## `Main.py` — quick compressor smoke test
 
@@ -163,17 +159,19 @@ this repo) or any manuscript of your own.
 python Main.py
 ```
 
-Reads a book text file (edit the hardcoded filename near the bottom of the
-file to point at one that exists — several alternatives are left commented
-out) and prints the `textcompressor.run()` output. Good for confirming your
-environment is set up correctly before running the heavier ELMo/classifier
-steps above.
+Prompts for a `.txt` file path (Enter defaults to the bundled
+`The_Great_Gatsby.txt`) and prints the `textcompressor.run()` output for it.
+Good for confirming your environment is set up correctly before running the
+heavier ELMo/classifier steps above.
 
 ## Notes
 
-- All file paths in these scripts are relative and hardcoded — run everything
-  from the repo root, and expect to hand-edit a filename here and there
-  (that's the normal way to point these scripts at a different book).
+- Neither this repo's own sample data nor any personal manuscripts are
+  checked in — the only bundled `.txt` file is the public-domain
+  `The_Great_Gatsby.txt`. `Main.py`, `textcompressor.demo()`, and
+  `genreclassifier.py`'s prediction entry point all prompt you for a file
+  path (defaulting to that sample) so you can test against your own writing
+  without editing any code.
 - `genreclassifier.build_logistic()` and `databuilder.add_embeddings()` are
   both slow (ELMo embedding + PCA over a ~1,300-book dataset); budget time
   accordingly, especially without a GPU.
