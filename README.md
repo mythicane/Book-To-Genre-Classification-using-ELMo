@@ -1,4 +1,4 @@
-# Book To Genre using ML
+# Book To Genre using ELMo
 
 Classifies full book texts into their associated genre(s) using classical/early
 NLP techniques (TF-IDF extractive summarization + [ELMo](https://en.wikipedia.org/wiki/ELMo)
