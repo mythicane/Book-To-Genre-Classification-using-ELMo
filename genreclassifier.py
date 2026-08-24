@@ -22,9 +22,8 @@ import time #timeing how long certain processes will take...
 
 def get_data():
     '''Grabs data pickled from databuilder.py and converts it into "x" and "y" data arrays.'''
-    #datasampler.pkl = 200 pts of randomly selected books... NOT balanced
     #data.pkl = full dataset... balanced, approx 1300 pts.
-    df = pd.read_pickle('datasampler.pkl') #reads pickle file generated from "databuilder.py"
+    df = pd.read_pickle('data.pkl') #reads pickle file generated from "databuilder.py"
 
     df = df[df["elmo_embeddings"].apply(lambda x: not np.all(x == 0))] #removes datapoints where the embedding is all zeroes...
 
@@ -130,7 +129,7 @@ def predict(text, model_name):
     pred = model.predict_proba(emb)
     pred = pred.tolist()
     pred = pred[0]
-    print("BOOK: The Great Gatsby." )
+    print("LIVE DEMO." )
     print("The Predictions for the given model is as follows..." ) #returns a prediction given a model and an embedding
     for i in range(len(pred)):
         print(f"{mlb.classes_[i]} :: {pred[i]*100:.4f} %")
@@ -193,7 +192,6 @@ if __name__ == "__main__":
 
     #Uncomment the model type that you want to use
     model_name = "logistic"
-    #model_name = "svc"
 
     #Executes a prediction
     start_time = time.time()

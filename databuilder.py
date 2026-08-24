@@ -81,15 +81,13 @@ def add_embeddings():
         except:
             print("Embedding Generation Error Encountered!!")
             embeddings.append(numpy.zeros(283648,))
-    try:    
+    try:
         df['elmo_embeddings'] = embeddings
         df.to_pickle('data.pkl')
         print("Updated data.pkl...")
     except:
         #print("Saving to .CVS Error Encountered!!")
         print("Saving to .PKL file Error Encountered!!")
-    print("Here's the breakpoint: PLEASE Triple Check that your data has loaded correctly!")
-    breakpoint()
 
 if __name__ == "__main__":
     #load_dataframe()
