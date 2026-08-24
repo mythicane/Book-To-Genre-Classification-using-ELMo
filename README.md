@@ -2,16 +2,16 @@
 
 Classifies full book texts into their associated genre(s) using classical/early
 NLP techniques (TF-IDF extractive summarization + [ELMo](https://en.wikipedia.org/wiki/ELMo)
-embeddings + a multi-label classifier). Built for **StoryForge**, to
-auto-suggest genres given a manuscript.
+embeddings + a multi-label classifier). Built in collaboration with **StoryForge: A Gamified Publishing Platform**, to
+auto-suggest genres given a manuscript without the use of LLMs and other Generative AI techniques. 
+Going "old school" circumnavigates the privacy risk that using LLMs brings up, protecting sensitive
+and developing writing manuscripts from being scraped and use as post-training data for these LLMs.
 
 Training/reference text comes in part from the [Project Gutenberg](https://www.gutenberg.org/)
 dataset (public-domain books), alongside the Brown corpus and the Kaggle
 "10,000 Books and Their Genres" dataset linked below.
 
-This is a research pipeline, not a packaged CLI: each script exposes functions
-you call by editing the `if __name__ == "__main__":` block at the bottom (most
-of the useful calls are already there, just commented out). This README walks
+This is a research pipeline, not a packaged CLI: This README walks
 through what each file does and the order you'd run them in.
 
 ## Pipeline overview
