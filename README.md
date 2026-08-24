@@ -166,12 +166,11 @@ heavier ELMo/classifier steps above.
 
 ## Notes
 
-- Neither this repo's own sample data nor any personal manuscripts are
-  checked in — the only bundled `.txt` file is the public-domain
+- the only bundled `.txt` file for demo purposes is the public-domain
   `The_Great_Gatsby.txt`. `Main.py`, `textcompressor.demo()`, and
   `genreclassifier.py`'s prediction entry point all prompt you for a file
   path (defaulting to that sample) so you can test against your own writing
-  without editing any code.
+  without editing any code. 
 - `genreclassifier.build_logistic()` and `databuilder.add_embeddings()` are
-  both slow (ELMo embedding + PCA over a ~1,300-book dataset); budget time
+  both VERY slow (ELMo embedding + PCA over a ~1,300-book dataset); budget time
   accordingly, especially without a GPU.
